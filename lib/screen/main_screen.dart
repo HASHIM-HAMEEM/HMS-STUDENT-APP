@@ -1,3 +1,4 @@
+import 'package:app/screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -27,9 +28,14 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt'); // Remove JWT from shared preferences
-    Navigator.of(context)
-        .pushReplacementNamed('/login'); // Navigate to login screen
+    await prefs.remove('jwt');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+    );
+    //Navigator.of(context).pushReplacementNamed('/login'); // Navigate to login screen
   }
 
   Future<void> _fetchStudentDetails() async {
