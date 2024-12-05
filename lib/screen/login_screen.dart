@@ -13,7 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
-  String purl = "https://cc88-52-160-41-102.ngrok-free.app/";
+  String purl = "http://104.40.23.115:3000/";
 
   Future<void> login() async {
     setState(() {

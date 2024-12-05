@@ -12,7 +12,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   String _studentDetails = '';
   List<Map<String, dynamic>> _transactionLogs = [];
-  String purl = 'https://cc88-52-160-41-102.ngrok-free.app/';
+  String purl = 'http://104.40.23.115:3000/';
 
   @override
   void initState() {
