@@ -12,7 +12,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   String _studentDetails = '';
   List<Map<String, dynamic>> _transactionLogs = [];
-  String purl = 'http://104.40.23.115:3000/';
+  String purl = 'https://72d7-104-40-23-115.ngrok-free.app';
 
   @override
   void initState() {
@@ -130,24 +130,61 @@ Date of Admission: ${data['s_dateadm']}
     return _transactionLogs.map((log) {
       // Determine the color based on the transaction type
       Color rowColor =
-          log['dt_ct'] == 'dt' ? Colors.red[200]! : Colors.green[200]!;
+          log['dt_ct'] == 'dt' ? Colors.red[50]! : Colors.green[50]!;
+      IconData icon =
+          log['dt_ct'] == 'dt' ? Icons.arrow_downward : Icons.arrow_upward;
+      Color iconColor = log['dt_ct'] == 'dt' ? Colors.red : Colors.green;
 
-      return Container(
-        color: rowColor, // Set the background color based on transaction type
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Transaction ID: ${log['transiction_id']}',
-              style: TextStyle(fontSize: 10),
-            ),
-            Text('Date: ${log['date']}'),
-            Text('Remarks: ${log['remarks']}'),
-            Divider(
-              color: Colors.black,
-            ), // Add a divider after each transaction
-          ],
+      return Card(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 3,
+        child: Container(
+          decoration: BoxDecoration(
+            color: rowColor, // Background color based on transaction type
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(icon,
+                  color: iconColor, size: 28), // Icon for transaction type
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Transaction ID: ${log['transiction_id']}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Date: ${log['date']}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Remarks: ${log['remarks']}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }).toList();
@@ -156,51 +193,113 @@ Date of Admission: ${data['s_dateadm']}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Main Screen')),
+      appBar: AppBar(title: Text('Student Details')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
-                  title: Text('Student Details'),
-                  subtitle: Text(_studentDetails.isNotEmpty
-                      ? _studentDetails
-                      : 'Loading...'),
+                  leading: Icon(Icons.person, color: Colors.blue),
+                  title: Text(
+                    'Student Details',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  subtitle: _studentDetails.isNotEmpty
+                      ? Text(_studentDetails)
+                      : Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(width: 10),
+                            Text('Loading student details...'),
+                          ],
+                        ),
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               Card(
-                child: Column(
-                  children: [
-                    ..._buildTransactionList(),
-                    if (_transactionLogs.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('No transactions available.'),
-                      ),
-                  ],
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              SizedBox(height: 10),
-              Card(
-                child: ListTile(
-                  title: Text('Credits'),
-                  subtitle: Column(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Developed by [Your Name]'),
-                      TextButton(
-                        onPressed: _logout,
-                        child: Text('Logout'),
+                      Text(
+                        'Transaction Logs',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      SizedBox(height: 10),
+                      _transactionLogs.isNotEmpty
+                          ? Column(
+                              children: _buildTransactionList(),
+                            )
+                          : Center(
+                              child: Column(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 10),
+                                  Text('Loading transactions...'),
+                                ],
+                              ),
+                            ),
                     ],
                   ),
                 ),
               ),
+              SizedBox(height: 16),
             ],
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'HMS Student App',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Card(
+              child: ListTile(
+                title: Text('Credits'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Developed by Hashim and Team'),
+                    TextButton(
+                      onPressed: _logout,
+                      child: Text('Logout'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

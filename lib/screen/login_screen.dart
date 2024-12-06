@@ -13,43 +13,59 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
-  String purl = "http://104.40.23.115:3000/";
+  String purl = "https://72d7-104-40-23-115.ngrok-free.app";
 
   Future<void> login() async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter both username and password.')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     final url = Uri.parse(purl + '/api/students/login');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        's_email': _usernameController.text,
-        's_password': _passwordController.text,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final jwt = data['token'];
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('jwt', jwt);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          's_email': _usernameController.text,
+          's_password': _passwordController.text,
+        }),
       );
-    } else {
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final jwt = data['token'];
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('jwt', jwt);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        );
+      } else {
+        final errorData = json.decode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  errorData['message'] ?? 'Login failed. Please try again.')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed. Please try again.')),
+        SnackBar(content: Text('An error occurred. Please try again later.')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
